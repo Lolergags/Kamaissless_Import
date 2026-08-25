@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.2.2
 // @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
@@ -127,6 +127,7 @@
         btn.style.textDecoration = 'none';
         btn.style.outline = 'none';
         btn.style.textAlign = 'center';
+        btn.style.whiteSpace = 'nowrap'; // Ensure button text is strictly single-line
 
         btn.onmouseenter = () => {
             if (!btn.disabled) btn.style.backgroundColor = theme.hoverColor;
@@ -155,11 +156,10 @@
             
             const newBtn = document.createElement('button');
             
-            // Match target element width dynamically if available, defaulting to 390px
-            const targetWidth = mainExportDiv.offsetWidth ? `${mainExportDiv.offsetWidth}px` : (mainExportDiv.style.width || '390px');
-            newBtn.style.width = targetWidth;
+            // Standard 390px width across all sites matching Chunithm / Ongeki buttons
+            newBtn.style.width = '390px';
             newBtn.style.maxWidth = '100%';
-            newBtn.style.height = mainExportDiv.offsetHeight ? `${mainExportDiv.offsetHeight}px` : '40px';
+            newBtn.style.height = '40px';
             newBtn.style.boxSizing = 'border-box';
             
             // Center element horizontally with auto block margins
@@ -215,11 +215,9 @@
                 newBtn.className = btn.className;
                 newBtn.style.cssText = btn.style.cssText;
                 
-                // Match width & center
-                if (btn.offsetWidth) {
-                    newBtn.style.width = `${btn.offsetWidth}px`;
-                }
+                newBtn.style.width = '390px';
                 newBtn.style.maxWidth = '100%';
+                newBtn.style.height = '40px';
                 newBtn.style.boxSizing = 'border-box';
                 newBtn.style.marginTop = '10px';
                 newBtn.style.marginBottom = '10px';
