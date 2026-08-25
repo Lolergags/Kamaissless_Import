@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.2.1
 // @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
