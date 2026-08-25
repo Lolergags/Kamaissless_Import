@@ -7,8 +7,8 @@
 // @match        https://chun.missless.net/*
 // @match        https://geki.missless.net/*
 // @match        https://mai.missless.net/*
-// @updateURL    https://raw.githubusercontent.com/Lolergags/Kamaissless_Import/main/KamaisslessImport.user.js
-// @downloadURL  https://raw.githubusercontent.com/Lolergags/Kamaissless_Import/main/KamaisslessImport.user.js
+// @updateURL    https://github.com/Lolergags/Kamaissless_Import/releases/latest/download/KamaisslessImport.user.js
+// @downloadURL  https://github.com/Lolergags/Kamaissless_Import/releases/latest/download/KamaisslessImport.user.js
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
