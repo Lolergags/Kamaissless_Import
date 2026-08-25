@@ -3,25 +3,19 @@
 A Tampermonkey userscript to easily import Missless data directly into Kamaitachi (`kamai.tachi.ac`) with a single click, completely avoiding the need to download or manually upload JSON files.
 
 ## Supported Games & Websites
-- **CHUNITHM**: `https://chun.missless.net/record/playlog`
-- **ONGEKI**: `https://geki.missless.net/record/playlog`
-- **maimai DX**: `https://mai.missless.net/record/playlog`
+- **CHUNITHM**: `https://chun.missless.net`
+- **ONGEKI**: `https://geki.missless.net`
+- **maimai DX**: `https://mai.missless.net`
 
 ## Features
 - **Multi-Game Support**: Seamlessly works on Chunithm, Ongeki, and Maimai playlog pages on Missless.
-- **Game-Themed Styling**: Features custom visual styling, hover/click dynamics, and 3D button shading designed to match each game's official website theme:
-  - **Chunithm**: Deep Maroon (`#8B0000`)
-  - **Ongeki**: Signature Magenta / Pink (`#E6007E`)
-  - **maimai DX**: Bright Orange (`#FF6600`)
 - **Direct Import**: Fetches export data directly in memory and uploads it to Kamaitachi's `file/batch-manual` import endpoint.
-- **Interactive Feedback**: Shows live loading states ("Importing to Kamaitachi...") while processing.
 - **Token Persistence**: Store your Kamaitachi API Token once across all supported Missless domains.
 
 ## Installation & Auto-Updates
 1. Ensure you have the [Tampermonkey](https://www.tampermonkey.net/) extension installed in your browser.
 2. Click here to install: **[Install KamaisslessImport Userscript](https://raw.githubusercontent.com/Lolergags/Kamaissless_Import/main/KamaisslessImport.user.js)**
-3. Confirm installation in Tampermonkey.
-4. **How Updates Work**: Tampermonkey checks the raw file URL (`@updateURL`). It will **only** update the installed script when the `@version` header is explicitly incremented (e.g. `1.2` -> `1.3`). Commits to `main` without a version bump will be safely ignored by Tampermonkey!
+3. Tampermonkey will automatically check new releases for updates.
 
 ## Usage
 1. Navigate to your playlog page on any supported Missless site:
