@@ -17,11 +17,11 @@ A Tampermonkey userscript to easily import Missless data directly into Kamaitach
 - **Interactive Feedback**: Shows live loading states ("Importing to Kamaitachi...") while processing.
 - **Token Persistence**: Store your Kamaitachi API Token once across all supported Missless domains.
 
-## Installation & Release Auto-Updates
+## Installation & Auto-Updates
 1. Ensure you have the [Tampermonkey](https://www.tampermonkey.net/) extension installed in your browser.
-2. Click here to install from the latest release: **[Install Latest Release](https://github.com/Lolergags/Kamaissless_Import/releases/latest/download/KamaisslessImport.user.js)** (or from the `main` branch raw file).
+2. Click here to install: **[Install KamaisslessImport Userscript](https://raw.githubusercontent.com/Lolergags/Kamaissless_Import/main/KamaisslessImport.user.js)**
 3. Confirm installation in Tampermonkey.
-4. **Release-Based Auto-Updates**: The script uses `@updateURL` and `@downloadURL` headers pointing to `https://github.com/Lolergags/Kamaissless_Import/releases/latest/download/KamaisslessImport.user.js`. Tampermonkey will only update when a new tagged **GitHub Release** is published with an updated `@version` and asset.
+4. **How Updates Work**: Tampermonkey checks the raw file URL (`@updateURL`). It will **only** update the installed script when the `@version` header is explicitly incremented (e.g. `1.2` -> `1.3`). Commits to `main` without a version bump will be safely ignored by Tampermonkey!
 
 ## Usage
 1. Navigate to your playlog page on any supported Missless site:
