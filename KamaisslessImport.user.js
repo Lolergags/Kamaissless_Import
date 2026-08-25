@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
@@ -124,6 +124,8 @@
         btn.style.fontWeight = 'bold';
         btn.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.4)';
         btn.style.transition = 'background-color 0.2s, transform 0.1s';
+        btn.style.textDecoration = 'none';
+        btn.style.outline = 'none';
 
         btn.onmouseenter = () => {
             if (!btn.disabled) btn.style.backgroundColor = theme.hoverColor;
@@ -151,12 +153,14 @@
             mainExportDiv.dataset.kamaitachiInjected = 'true';
             
             const newBtn = document.createElement('button');
-            // Style it to match the layout of the original div but clearly distinct and game-themed
+            // Style it to match the layout of the original div, placed clearly on its own line below
             newBtn.style.width = '390px';
             newBtn.style.height = '40px';
-            newBtn.style.marginLeft = '0px'; // Perfectly flush side-by-side
-            newBtn.style.marginTop = '0px';
-            newBtn.style.display = 'inline-block'; // Ensure it stays side-by-side flush
+            newBtn.style.marginLeft = '0px';
+            newBtn.style.marginTop = '10px'; // Positioned below with spacing
+            newBtn.style.marginBottom = '10px';
+            newBtn.style.display = 'block';  // Own line below
+            newBtn.style.clear = 'both';
             
             styleButton(newBtn, theme);
 
@@ -202,6 +206,10 @@
                 newBtn.className = btn.className;
                 newBtn.style.cssText = btn.style.cssText;
                 newBtn.style.marginLeft = '0px';
+                newBtn.style.marginTop = '10px';
+                newBtn.style.marginBottom = '10px';
+                newBtn.style.display = 'block';
+                newBtn.style.clear = 'both';
                 
                 styleButton(newBtn, theme);
 
