@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  One-click export from chun.missless.net to Kamaitachi
+// @version      1.2
+// @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
+// @match        https://geki.missless.net/*
+// @match        https://mai.missless.net/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -14,6 +16,42 @@
 
 (function() {
     'use strict';
+
+    // Game-specific visual themes matching Chunithm, Ongeki, and Maimai site aesthetics
+    const GAME_THEMES = {
+        'chun.missless.net': {
+            gameName: 'Chunithm',
+            bgColor: '#8B0000',      // Deep Maroon (Chunithm)
+            borderColor: '#5a0000',  // 3D Shading Dark Maroon
+            hoverColor: '#a30000',
+            activeColor: '#700000'
+        },
+        'geki.missless.net': {
+            gameName: 'Ongeki',
+            bgColor: '#E6007E',      // Ongeki Pink / Magenta
+            borderColor: '#990050',  // Dark Magenta Shading
+            hoverColor: '#FF1493',
+            activeColor: '#C2006A'
+        },
+        'mai.missless.net': {
+            gameName: 'Maimai',
+            bgColor: '#FF6600',      // Maimai DX Orange
+            borderColor: '#BF360C',  // Dark Orange Shading
+            hoverColor: '#FF7A00',
+            activeColor: '#D95700'
+        }
+    };
+
+    function getCurrentTheme() {
+        const hostname = window.location.hostname;
+        return GAME_THEMES[hostname] || {
+            gameName: 'Kamaitachi',
+            bgColor: '#8B0000',
+            borderColor: '#5a0000',
+            hoverColor: '#a30000',
+            activeColor: '#700000'
+        };
+    }
 
     function getKamaitachiToken() {
         let token = GM_getValue("kamaitachi_token");
@@ -43,12 +81,15 @@
             const jsonStr = JSON.stringify(data);
             const blob = new Blob([jsonStr], { type: 'application/json' });
 
+            const hostname = window.location.hostname;
+            const gameKey = hostname.split('.')[0] || 'missless';
+
             const formData = new FormData();
             // Fastify requires text fields to come before file fields in the multipart stream
             formData.append('importType', 'file/batch-manual');
             
             // Appending as scoreData as this is the standard field Tachi expects for score files
-            formData.append('scoreData', blob, `missless_logs${isV3 ? '_v3' : ''}.json`);
+            formData.append('scoreData', blob, `missless_${gameKey}_logs${isV3 ? '_v3' : ''}.json`);
 
             const uploadResponse = await fetch("https://kamai.tachi.ac/api/v1/import/file", {
                 method: "POST",
@@ -70,48 +111,74 @@
         }
     }
 
+    function styleButton(btn, theme) {
+        btn.style.backgroundColor = theme.bgColor;
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.borderBottom = `4px solid ${theme.borderColor}`;
+        btn.style.borderRadius = '5px';
+        btn.style.fontSize = '16px';
+        btn.style.cursor = 'pointer';
+        btn.style.fontWeight = 'bold';
+        btn.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.4)';
+        btn.style.transition = 'background-color 0.2s, transform 0.1s';
+
+        btn.onmouseenter = () => {
+            if (!btn.disabled) btn.style.backgroundColor = theme.hoverColor;
+        };
+        btn.onmouseleave = () => {
+            if (!btn.disabled) btn.style.backgroundColor = theme.bgColor;
+        };
+        btn.onmousedown = () => {
+            if (!btn.disabled) btn.style.backgroundColor = theme.activeColor;
+        };
+        btn.onmouseup = () => {
+            if (!btn.disabled) btn.style.backgroundColor = theme.hoverColor;
+        };
+    }
 
     function injectButtons() {
         // Only run on the playlog page
         if (!window.location.href.includes('/record/playlog')) return;
 
-        let injected = false;
+        const theme = getCurrentTheme();
 
         // Strategy 1: Find the main modal-opening export div (provided by user HTML)
-        const mainExportDiv = document.querySelector('div[onclick*="exportModal"], div[style*="btn_base_playexport.png"]');
+        const mainExportDiv = document.querySelector('div[onclick*="exportModal"], div[style*="btn_base_playexport.png"], div[style*="playexport"], div[class*="playexport"], div[onclick*="exportPlays"]');
         if (mainExportDiv && !mainExportDiv.dataset.kamaitachiInjected) {
             mainExportDiv.dataset.kamaitachiInjected = 'true';
             
             const newBtn = document.createElement('button');
-            // Style it to match the layout of the original div but clearly distinct
+            // Style it to match the layout of the original div but clearly distinct and game-themed
             newBtn.style.width = '390px';
             newBtn.style.height = '40px';
             newBtn.style.marginLeft = '0px'; // Perfectly flush side-by-side
             newBtn.style.marginTop = '0px';
-            newBtn.style.backgroundColor = '#8B0000'; // Deep Maroon
-            newBtn.style.color = 'white';
-            newBtn.style.border = 'none';
-            newBtn.style.borderBottom = '4px solid #5a0000'; // 3D Shading effect on the bottom
-            newBtn.style.borderRadius = '5px';
-            newBtn.style.fontSize = '16px';
-            newBtn.style.cursor = 'pointer';
-            newBtn.style.fontWeight = 'bold';
             newBtn.style.display = 'inline-block'; // Ensure it stays side-by-side flush
-            newBtn.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.4)'; // Nice drop shadow
+            
+            styleButton(newBtn, theme);
+
             newBtn.innerText = 'Send to Kamaitachi';
             
-            newBtn.onclick = (e) => {
+            newBtn.onclick = async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                sendToKamaitachi(true); // Default to v3 as per standard
+                const origText = newBtn.innerText;
+                newBtn.disabled = true;
+                newBtn.innerText = 'Importing to Kamaitachi...';
+                try {
+                    await sendToKamaitachi(true); // Default to v3 as per standard
+                } finally {
+                    newBtn.disabled = false;
+                    newBtn.innerText = origText;
+                }
             };
 
             mainExportDiv.parentNode.insertBefore(newBtn, mainExportDiv.nextSibling);
-            injected = true;
         }
 
         // Strategy 2: Find all likely clickable elements inside the modal or elsewhere
-        const clickableElements = Array.from(document.querySelectorAll('button, a, [role="button"], [class*="btn"], [class*="button"]'));
+        const clickableElements = Array.from(document.querySelectorAll('button, a, [role="button"], [class*="btn"], [class*="button"], div[onclick]'));
 
         clickableElements.forEach(btn => {
             if (btn.dataset.kamaitachiInjected) return;
@@ -128,21 +195,31 @@
                     isV3 = false;
                 }
 
-                const newBtn = document.createElement(btn.tagName);
-                if (btn.tagName === 'A') newBtn.href = '#';
+                const newBtn = document.createElement(btn.tagName === 'DIV' ? 'button' : btn.tagName);
+                if (newBtn.tagName === 'A') newBtn.href = '#';
                 newBtn.className = btn.className;
                 newBtn.style.cssText = btn.style.cssText;
                 newBtn.style.marginLeft = '0px';
+                
+                styleButton(newBtn, theme);
+
                 newBtn.innerText = `Send to Kamaitachi${isV3 ? '' : ' (v1)'}`;
                 
-                newBtn.onclick = (e) => {
+                newBtn.onclick = async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    sendToKamaitachi(isV3);
+                    const origText = newBtn.innerText;
+                    newBtn.disabled = true;
+                    newBtn.innerText = 'Importing...';
+                    try {
+                        await sendToKamaitachi(isV3);
+                    } finally {
+                        newBtn.disabled = false;
+                        newBtn.innerText = origText;
+                    }
                 };
 
                 btn.parentNode.insertBefore(newBtn, btn.nextSibling);
-                injected = true;
             }
         });
 
