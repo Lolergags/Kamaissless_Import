@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
@@ -126,6 +126,7 @@
         btn.style.transition = 'background-color 0.2s, transform 0.1s';
         btn.style.textDecoration = 'none';
         btn.style.outline = 'none';
+        btn.style.textAlign = 'center';
 
         btn.onmouseenter = () => {
             if (!btn.disabled) btn.style.backgroundColor = theme.hoverColor;
@@ -153,14 +154,22 @@
             mainExportDiv.dataset.kamaitachiInjected = 'true';
             
             const newBtn = document.createElement('button');
-            // Style it to match the layout of the original div, placed clearly on its own line below
-            newBtn.style.width = '390px';
-            newBtn.style.height = '40px';
-            newBtn.style.marginLeft = '0px';
-            newBtn.style.marginTop = '10px'; // Positioned below with spacing
+            
+            // Match target element width dynamically if available, defaulting to 390px
+            const targetWidth = mainExportDiv.offsetWidth ? `${mainExportDiv.offsetWidth}px` : (mainExportDiv.style.width || '390px');
+            newBtn.style.width = targetWidth;
+            newBtn.style.maxWidth = '100%';
+            newBtn.style.height = mainExportDiv.offsetHeight ? `${mainExportDiv.offsetHeight}px` : '40px';
+            newBtn.style.boxSizing = 'border-box';
+            
+            // Center element horizontally with auto block margins
+            newBtn.style.marginTop = '10px';
             newBtn.style.marginBottom = '10px';
-            newBtn.style.display = 'block';  // Own line below
+            newBtn.style.marginLeft = 'auto';
+            newBtn.style.marginRight = 'auto';
+            newBtn.style.display = 'block';
             newBtn.style.clear = 'both';
+            newBtn.style.alignSelf = 'center';
             
             styleButton(newBtn, theme);
 
@@ -205,11 +214,20 @@
                 if (newBtn.tagName === 'A') newBtn.href = '#';
                 newBtn.className = btn.className;
                 newBtn.style.cssText = btn.style.cssText;
-                newBtn.style.marginLeft = '0px';
+                
+                // Match width & center
+                if (btn.offsetWidth) {
+                    newBtn.style.width = `${btn.offsetWidth}px`;
+                }
+                newBtn.style.maxWidth = '100%';
+                newBtn.style.boxSizing = 'border-box';
                 newBtn.style.marginTop = '10px';
                 newBtn.style.marginBottom = '10px';
+                newBtn.style.marginLeft = 'auto';
+                newBtn.style.marginRight = 'auto';
                 newBtn.style.display = 'block';
                 newBtn.style.clear = 'both';
+                newBtn.style.alignSelf = 'center';
                 
                 styleButton(newBtn, theme);
 
