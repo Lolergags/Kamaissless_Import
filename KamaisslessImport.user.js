@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamaisslessImport
 // @namespace    http://tampermonkey.net/
-// @version      1.2.2
+// @version      1.2.3
 // @description  One-click export from Missless (Chunithm, Ongeki, Maimai) to Kamaitachi
 // @author       Lolergags
 // @match        https://chun.missless.net/*
@@ -80,10 +80,19 @@
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            const hostname = window.location.hostname;
+            if (hostname === 'geki.missless.net' && Array.isArray(data.scores)) {
+                // Timestamps for Ongeki exports are incorrectly offset by +9 hours
+                const offsetMs = 9 * 60 * 60 * 1000;
+                for (const score of data.scores) {
+                    if (typeof score.timeAchieved === 'number') {
+                        score.timeAchieved -= offsetMs;
+                    }
+                }
+            }
             const jsonStr = JSON.stringify(data);
             const blob = new Blob([jsonStr], { type: 'application/json' });
 
-            const hostname = window.location.hostname;
             const gameKey = hostname.split('.')[0] || 'missless';
 
             const formData = new FormData();
